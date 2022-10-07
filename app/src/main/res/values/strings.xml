@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">room_project</string>
+    <string name="update_button">Update</string>
+    <string name="remove_button">Remove</string>
 </resources>

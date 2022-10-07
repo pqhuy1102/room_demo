@@ -1,9 +1,11 @@
 package com.example.room_project
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,6 +23,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var studentRecyclerView: RecyclerView
     private lateinit var studentRecyclerViewAdapter: StudentRecyclerViewAdapter
 
+    private lateinit var selectedStudent: Student
+    private var isStudentItemClicked:Boolean = false
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -36,8 +42,22 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this, factory)[StudentViewModel::class.java]
 
         saveButton.setOnClickListener {
-            saveStudentData()
-            clearInput()
+            if(isStudentItemClicked){
+                updateStudentData()
+                clearInput()
+            } else {
+                saveStudentData()
+                clearInput()
+            }
+        }
+
+        deleteButton.setOnClickListener {
+            if(isStudentItemClicked){
+                deleteStudentData()
+                clearInput()
+            } else {
+                clearInput()
+            }
         }
 
         initRecyclerView()
@@ -50,6 +70,33 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    private fun updateStudentData(){
+        viewModel.updateStudent(
+            Student(
+                selectedStudent.id,
+                nameEditText.text.toString(),
+                emaiEditText.text.toString()
+            )
+        )
+        isStudentItemClicked = false
+        saveButton.text = "Save"
+        deleteButton.text = "Clear"
+    }
+
+    private fun deleteStudentData(){
+        viewModel.deleteStudent(
+                Student(
+                    selectedStudent.id,
+                    nameEditText.text.toString(),
+                    emaiEditText.text.toString()
+                )
+            )
+                    isStudentItemClicked = false
+                    saveButton.text = "Save"
+                    deleteButton.text = "Clear"
+
+    }
+
     private fun clearInput(){
         nameEditText.setText("")
         emaiEditText.setText("")
@@ -57,15 +104,28 @@ class MainActivity : AppCompatActivity() {
 
     private fun initRecyclerView(){
         studentRecyclerView.layoutManager = LinearLayoutManager(this)
-        studentRecyclerViewAdapter = StudentRecyclerViewAdapter()
+        studentRecyclerViewAdapter = StudentRecyclerViewAdapter{
+            selectedStudent:Student -> studentItemClicked(selectedStudent)
+        }
         studentRecyclerView.adapter = studentRecyclerViewAdapter
         displayStudentsList()
 
     }
+
+    @SuppressLint("NotifyDataSetChanged")
     private fun displayStudentsList(){
         viewModel.students.observe(this) {
             studentRecyclerViewAdapter.setStudentList(it)
             studentRecyclerViewAdapter.notifyDataSetChanged()
         }
+    }
+
+    private fun studentItemClicked(student:Student){
+        isStudentItemClicked = true
+        selectedStudent = student
+        saveButton.text = getString(R.string.update_button)
+        deleteButton.text = getString(R.string.remove_button)
+        nameEditText.setText(selectedStudent.name)
+        emaiEditText.setText(selectedStudent.email)
     }
 }
