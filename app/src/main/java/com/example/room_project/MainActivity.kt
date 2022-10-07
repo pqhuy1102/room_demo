@@ -1,6 +1,5 @@
 package com.example.room_project
 
-import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -30,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         emaiEditText = findViewById(R.id.edtEmail)
         saveButton = findViewById(R.id.btnSave)
         deleteButton = findViewById(R.id.btnDelete)
-        studentRecyclerView = findViewById(R.id.rcvStudent)
+        studentRecyclerView = findViewById(R.id.rcvStudents)
 
         val dao = StudentDatabase.getInstance(application).studentDao()
         val factory = StudentViewModelFactory(dao)
@@ -42,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         initRecyclerView()
+
     }
 
     private fun saveStudentData(){
@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity() {
         studentRecyclerView.layoutManager = LinearLayoutManager(this)
         studentRecyclerViewAdapter = StudentRecyclerViewAdapter()
         studentRecyclerView.adapter = studentRecyclerViewAdapter
+        displayStudentsList()
 
     }
     private fun displayStudentsList(){
